@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>俄语四六级成绩录入</title>
-    <!-- 引入 Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: -apple-system, sans-serif; background: linear-gradient(135deg, #f6f8fd 0%, #e9f0f9 100%); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
@@ -22,63 +21,38 @@
     <div class="form-container">
         <h2>🎉 成绩捷报墙录入</h2>
         <form id="scoreForm">
-            <div class="form-group">
-                <label>姓名</label>
-                <input type="text" id="name" required placeholder="请输入姓名或昵称">
-            </div>
-            
-            <div class="form-group">
-                <label>报考等级</label>
+            <div class="form-group"><label>姓名</label><input type="text" id="name" required></div>
+            <div class="form-group"><label>报考等级</label>
                 <div class="radio-group">
                     <label><input type="radio" name="level" value="俄语四级" checked> 俄语四级</label>
                     <label><input type="radio" name="level" value="俄语六级"> 俄语六级</label>
                 </div>
             </div>
-            
-            <!-- 修改为支持 0-100 的小数 -->
-            <div class="form-group">
-                <label>考试总分 (0-100，支持小数)</label>
-                <input type="number" id="score" required min="0" max="100" step="0.1" placeholder="例如：85.5">
-            </div>
-            
-            <!-- 修改为你指定的 8 种班型 -->
-            <div class="form-group">
-                <label>班型</label>
+            <div class="form-group"><label>考试总分</label><input type="number" id="score" required min="0" max="100" step="0.1"></div>
+            <div class="form-group"><label>班型</label>
                 <select id="className">
-                    <option value="全程班">全程班</option>
-                    <option value="直通班">直通班</option>
-                    <option value="练题班">练题班</option>
-                    <option value="真题班">真题班</option>
-                    <option value="听力训练营">听力训练营</option>
-                    <option value="其他班次">其他班次</option>
-                    <option value="仅书籍">仅书籍</option>
-                    <option value="自学">自学</option>
+                    <option value="全程班">全程班</option><option value="直通班">直通班</option>
+                    <option value="练题班">练题班</option><option value="真题班">真题班</option>
+                    <option value="听力训练营">听力训练营</option><option value="其他班次">其他班次</option>
+                    <option value="仅书籍">仅书籍</option><option value="自学">自学</option>
                 </select>
             </div>
-            
-            <div class="form-group">
-                <label>考后感言</label>
-                <input type="text" id="comment" placeholder="有什么想对老师或大家说的？">
-            </div>
-            
+            <div class="form-group"><label>考后感言</label><input type="text" id="comment"></div>
             <button type="submit" class="btn-submit" id="submitBtn">发送捷报上大屏</button>
             <div class="success-msg" id="successMsg">✨ 发送成功！快看大屏！</div>
         </form>
     </div>
 
     <script>
-        // ==========================================
-        // 这里只有唯一的一份配置！
-        // ==========================================
-        const supabaseUrl = 'https://jqkacisuyoebxuaugmdh.supabase.co'; // 填你的URL
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxa2FjaXN1eW9lYnh1YXVnbWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTYyOTcsImV4cCI6MjEwMzA3MjI5N30.un4kBkbo0XLt-axHLOxxWROeL8wSsyW_487hxJme3CU'; // 填你eyJ开头的长串Key
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseUrl = 'https://jqkacisuyoebxuaugmdh.supabase.co';
+        // 注意：下面这个是示例，请一定要换成你刚才在后台重新复制的、eyJ开头的正确的 API Key！！！
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxa2FjaXN1eW9lYnh1YXVnbWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTYyOTcsImV4cCI6MjEwMzA3MjI5N30.un4kBkbo0XLt-axHLOxxWROeL8wSsyW_487hxJme3CU';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         document.getElementById('scoreForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.innerText = '正在发送...'; 
-            btn.disabled = true;
+            btn.innerText = '正在发送...'; btn.disabled = true;
 
             const name = document.getElementById('name').value;
             const level = document.querySelector('input[name="level"]:checked').value;
@@ -86,21 +60,14 @@
             const class_name = document.getElementById('className').value;
             const comment = document.getElementById('comment').value;
 
-            // 写入数据库
-            const { error } = await supabase.from('scores').insert([{ name, level, score, class_name, comment }]);
+            const { error } = await supabaseClient.from('scores').insert([{ name, level, score, class_name, comment }]);
             
             if (!error) {
                 document.getElementById('successMsg').style.display = 'block';
-                setTimeout(() => { 
-                    document.getElementById('scoreForm').reset(); 
-                    btn.innerText = '发送捷报上大屏'; 
-                    btn.disabled = false; 
-                    document.getElementById('successMsg').style.display = 'none'; 
-                }, 3000);
+                setTimeout(() => { document.getElementById('scoreForm').reset(); btn.innerText = '发送捷报上大屏'; btn.disabled = false; document.getElementById('successMsg').style.display = 'none'; }, 3000);
             } else {
-                alert('发送失败，具体原因：' + error.message); 
-                btn.innerText = '发送捷报上大屏'; 
-                btn.disabled = false;
+                alert('发送失败，错误信息：' + error.message); 
+                btn.innerText = '发送捷报上大屏'; btn.disabled = false;
             }
         });
     </script>
